@@ -1,0 +1,4 @@
+name: PermaCart
+main: com.github.thrimbor.permacart.PermaCart
+version: 1.0
+description: PermaCart is a plugin which keeps the chunks around minecarts loaded.
