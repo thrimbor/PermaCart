@@ -21,11 +21,11 @@ public class PermaCart extends JavaPlugin implements Listener {
 		
 		getServer().getPluginManager().registerEvents(this, this);		
 		
-		getLogger().info(this.getDescription().getName() + "is now enabled");
+		getLogger().info(this.getDescription().getName() + " is now enabled");
 	}
 	
 	public void onDisable () {
-		getLogger().info(this.getDescription().getName() + "is now disabled");
+		getLogger().info(this.getDescription().getName() + " is now disabled");
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -45,29 +45,19 @@ public class PermaCart extends JavaPlugin implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onUnload (ChunkUnloadEvent event) {
-		for (Entity entity : event.getChunk().getEntities()) {
-			if (entity instanceof Minecart) {
-				if (((Minecart)entity).getVelocity().length() > 0) {
-					event.setCancelled(true);
-					return;
-				}
-			}
-		}
+		int x = event.getChunk().getX();
+		int z = event.getChunk().getZ();
+		World world = event.getWorld();
 		
-		// if stationary carts should be kept loaded also
-		if (this.keepStationaryCartsLoaded) {
-			int x = event.getChunk().getX();
-			int z = event.getChunk().getZ();
-			World world = event.getWorld();
-			
-			for (int xr = x-radius; xr <= x+radius; xr++)
-				for (int zr = z-radius; zr <= z+radius; zr++)
+		for (int xr = x-radius; xr <= x+radius; xr++)
+			for (int zr = z-radius; zr <= z+radius; zr++)
+				if (world.isChunkLoaded(xr, zr))
 					for (Entity entity : world.getChunkAt(xr, zr).getEntities())
-						if (entity instanceof Minecart) {
-							event.setCancelled(true);
-							return;
-						}
-		}
+						if (entity instanceof Minecart)
+							if ((((Minecart)entity).getVelocity().length() > 0) || this.keepStationaryCartsLoaded) {
+								event.setCancelled(true);
+								return;
+							}
 	}
 
 }
